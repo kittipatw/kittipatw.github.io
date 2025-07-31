@@ -134,10 +134,15 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-document.addEventListener("touchstart", function (event) {
-  // Prevent default touch behavior like zoom on double-tap if needed
-  event.preventDefault();
-  handleInteraction();
+document.querySelectorAll(".touch-area").forEach(function (el) {
+  el.addEventListener(
+    "touchstart",
+    function (event) {
+      event.preventDefault(); // Prevents scrolling or zooming if needed
+      handleInteraction();
+    },
+    { passive: false }
+  );
 });
 
 checkbox.addEventListener("change", function () {
