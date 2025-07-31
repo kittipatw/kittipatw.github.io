@@ -141,6 +141,14 @@ document.querySelectorAll(".touch-area").forEach(function (el) {
     "touchstart",
     function (event) {
       event.preventDefault(); // Prevents scrolling or zooming if needed
+
+      let x = new SpeechSynthesisUtterance("Hello");
+
+      x.rate = 1;
+      x.lang = "en-US";
+
+      speechSynthesis.speak(x);
+
       handleInteraction();
     },
     { passive: false }
