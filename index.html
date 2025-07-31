@@ -90,14 +90,14 @@
       <div id="big-label" class="" style="font-size: 10em; line-height: 1;"></div>
     </div>
     <div class="row touch-area" style="height: 25%;">
-      <button id="say-btn">Say Something</button>
+      <button ontouchstart="speakNow()">Tap me</button>
+      
       <script>
-        document.getElementById("say-btn").addEventListener("click", function () {
-          const utter = new SpeechSynthesisUtterance("Hello, this is working.");
+        function speakNow() {
+          const utter = new SpeechSynthesisUtterance("Hello from iPad!");
           utter.rate = 1;
-          utter.lang = "en-US";
           speechSynthesis.speak(utter);
-        });
+        }
       </script>
     </div>
 
