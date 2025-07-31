@@ -1,14 +1,106 @@
 <!DOCTYPE html>
-<html>
-<body>
-  <button id="say-btn">Say Something</button>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>SP Practice Web</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.1/font/bootstrap-icons.css" />
+
+  <!-- <link rel="stylesheet" href="{% static 'tg_airports_style.css' %}"> -->
+
+  <style>
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+
+<body style="height: 100vh; width: 100vw;">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <!-- Left column: Branding -->
+      <div class="col text-start d-flex align-items-center">
+        <a class="navbar-brand ms-3" href="/">SP Practice Web</a>
+        <span class="badge text-bg-warning">Beta</span>
+      </div>
+
+      <!-- Center column: Menu bar -->
+      <div class="col text-center">
+        <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            <li class="nav-item mx-2">
+              <!-- <a class="nav-link active" href="">Dernjoot</a> -->
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right column: Developed by -->
+      <div class="col text-end">
+        <span class="navbar-text me-3">Dernjoot</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toast Container -->
+  <div id="status-toast" class="toast-container position-fixed top-25 end-0 p-3"></div>
+
+  <div class="container text-center mt-4" style="height: 85%;">
+    <div class="row" style="height: 15%;">
+      <div
+        class="col bg-secondary border border-dark border-opacity-25 rounded d-flex align-items-center justify-content-center"
+        style="--bs-bg-opacity: .05;">
+        <button id='rhythm-toggle-btn' type="button" class="btn btn-primary">Start</button>
+
+        <label class="form-label ms-3">
+          BPM: <span id="bpm-display">60</span>
+          <input type="range" class="form-range" id="bpm-slider" min="40" max="100" value="60" step="5">
+        </label>
+      </div>
+      <div class="col-1"></div>
+      <div
+        class="col bg-secondary border border-dark border-opacity-25 rounded d-flex flex-column justify-content-center"
+        style="--bs-bg-opacity: .05;">
+        <div class="row">
+          <div class="col d-flex align-items-center justify-content-center form-check form-switch">
+            <input class="form-check-input me-2" type="checkbox" id="hide-question">
+            <label class="form-check-label" for="hide-question">Hide question</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col d-flex align-items-center justify-content-center form-check form-switch">
+            <input class="form-check-input me-2" type="checkbox" id="read-question">
+            <label class="form-check-label" for="read-question">Read question</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row touch-area d-flex align-items-end justify-content-center" style="height: 25%;">
+      <div id="small-label" class="mb-4" style="font-size: 3em; line-height: 1;">Press spacebar to
+        begin.</div>
+    </div>
+    <div class="row touch-area d-flex align-items-start justify-content-center" style="height: 35%;">
+      <div id="big-label" class="" style="font-size: 10em; line-height: 1;"></div>
+    </div>
+    <div class="row touch-area" style="height: 25%;"></div>
+
+  </div>
+
   <script>
-    document.getElementById("say-btn").addEventListener("click", function () {
-      const utter = new SpeechSynthesisUtterance("Hello, this is working.");
-      utter.rate = 1;
-      utter.lang = "en-US";
-      speechSynthesis.speak(utter);
-    });
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+    crossorigin="anonymous"></script>
+  <script src="metronome.js"></script>
+  <script src="question_generation.js"></script>
 </body>
+
 </html>
