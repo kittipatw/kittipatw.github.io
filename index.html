@@ -89,17 +89,7 @@
     <div class="row touch-area d-flex align-items-start justify-content-center" style="height: 35%;">
       <div id="big-label" class="" style="font-size: 10em; line-height: 1;"></div>
     </div>
-    <div class="row touch-area" style="height: 25%;">
-      <button ontouchstart="speakNow()">Tap me</button>
-      
-      <script>
-        function speakNow() {
-          const utter = new SpeechSynthesisUtterance("Hello from iPad!");
-          utter.rate = 1;
-          speechSynthesis.speak(utter);
-        }
-      </script>
-    </div>
+    <div class="row touch-area" style="height: 25%;"></div>
 
   </div>
 
