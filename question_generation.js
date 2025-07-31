@@ -9,26 +9,35 @@ let waitingForAnswer = false;
 let display_status = "none";
 
 let read_question = false;
+let voicesReady = false;
 
-let voicesLoaded = false;
-
-// Ensure voices are loaded before using speechSynthesis
-function loadVoices() {
+// Load voices once on page load
+function preloadVoices() {
   return new Promise((resolve) => {
-    let voices = speechSynthesis.getVoices();
-    if (voices.length !== 0) {
-      voicesLoaded = true;
-      resolve();
-    } else {
-      speechSynthesis.onvoiceschanged = () => {
-        voicesLoaded = true;
+    const load = () => {
+      const voices = speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        voicesReady = true;
         resolve();
-      };
-    }
+      } else {
+        speechSynthesis.onvoiceschanged = () => {
+          voicesReady = true;
+          resolve();
+        };
+      }
+    };
+    // Give browsers time to populate voices
+    setTimeout(load, 100);
   });
 }
 
-// For generate medium difficulty multiplication problem
+window.addEventListener("load", () => {
+  preloadVoices().then(() => {
+    console.log("Voices loaded and ready.");
+  });
+});
+
+// Generate medium difficulty multiplication operand
 function generate_multiplication_operand() {
   const roundFriendly = [10, 20, 30, 40, 50];
 
@@ -45,38 +54,41 @@ function generate_multiplication_operand() {
     const divisibleA = a % 10 === 0;
     const divisibleB = b % 10 === 0;
 
-    if (divisibleA && divisibleB) {
-      continue;
-    }
-
-    if (closeToRoundA && b % 10 > 4) {
-      continue;
-    }
-    if (closeToRoundB && a % 10 > 4) {
-      continue;
-    }
+    if (divisibleA && divisibleB) continue;
+    if (closeToRoundA && b % 10 > 4) continue;
+    if (closeToRoundB && a % 10 > 4) continue;
 
     if (
       (closeToRoundA || closeToRoundB || divisibleA || divisibleB) &&
       a !== 10 &&
       b !== 10
     ) {
-      if (Math.random() < 0.5) {
-        return [a, b];
-      } else {
-        return [b, a];
-      }
+      return Math.random() < 0.5 ? [a, b] : [b, a];
     }
   }
 }
 
+// Speak text aloud (only if voices ready and interaction is direct)
+function speakNow(text) {
+  if (!voicesReady || !read_question) return;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1;
+  utterance.lang = "en-US";
+
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.lang === "en-US" && v.name.includes("Google")) || voices[0];
+  if (preferred) utterance.voice = preferred;
+
+  speechSynthesis.speak(utterance);
+}
+
 function generateQuestion() {
-  let num1 = Math.floor(Math.random() * 100) + 1; // 1 to 100
+  let num1 = Math.floor(Math.random() * 100) + 1;
   let num2 = Math.floor(Math.random() * 100) + 1;
   const operators = ["+", "-", "x"];
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
-  // If the random operator is multiplication, we call the function to give us medium difficulty problem
   if (operator === "x") {
     [num1, num2] = generate_multiplication_operand();
   }
@@ -84,6 +96,7 @@ function generateQuestion() {
   let question = `${num1} ${operator} ${num2}`;
   let question_speech = `${num1} ${operator} ${num2}`;
   let answer;
+
   switch (operator) {
     case "+":
       answer = num1 + num2;
@@ -103,36 +116,19 @@ function generateQuestion() {
   document.getElementById("big-label").innerText = question;
   document.getElementById("small-label").innerText = "";
 
-  let speech = new SpeechSynthesisUtterance(question_speech);
-
-  speech.rate = 1;
-
-  if (read_question) {
-    loadVoices().then(() => {
-      speechSynthesis.speak(speech);
-    });
-  }
-
+  speakNow(question_speech);
   waitingForAnswer = true;
 }
 
-// This function contains the core logic to be shared
+// Main interaction handler
 function handleInteraction() {
   if (waitingForAnswer) {
     checkbox.disabled = true;
 
-    // Move question to small-label and show answer in big-label
     document.getElementById("small-label").innerText = currentQuestion;
     document.getElementById("big-label").innerText = currentAnswer;
 
-    let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
-    speech_2.rate = 1;
-
-    if (read_question) {
-      loadVoices().then(() => {
-        speechSynthesis.speak(speech_2);
-      });
-    }
+    speakNow(String(currentAnswer));
 
     if (big_label.classList.contains("hide") && checkbox.checked) {
       big_label.classList.remove("hide");
@@ -141,36 +137,37 @@ function handleInteraction() {
     waitingForAnswer = false;
   } else {
     checkbox.disabled = false;
-    // Generate a new question
+
     if (!big_label.classList.contains("hide") && checkbox.checked) {
       big_label.classList.add("hide");
     }
+
     generateQuestion();
   }
 }
 
+// Handle spacebar
 document.addEventListener("keydown", function (event) {
   if (event.code === "Space") {
-    event.preventDefault(); // prevent page scroll
+    event.preventDefault();
     handleInteraction();
   }
 });
 
+// Handle screen tap
 document.querySelectorAll(".touch-area").forEach(function (el) {
-  el.addEventListener(
-    "touchstart",
-    function (event) {
-      event.preventDefault(); // Prevents scrolling or zooming if needed
-      handleInteraction();
-    },
-    { passive: false }
-  );
+  el.addEventListener("touchstart", function (event) {
+    event.preventDefault();
+    handleInteraction();
+  }, { passive: false });
 });
 
+// Toggle question visibility
 checkbox.addEventListener("change", function () {
   document.getElementById("big-label").classList.toggle("hide");
 });
 
+// Toggle read aloud
 read_question_checkbox.addEventListener("change", function () {
   read_question = this.checked;
 });
