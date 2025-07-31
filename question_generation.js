@@ -96,38 +96,48 @@ function generateQuestion() {
   waitingForAnswer = true;
 }
 
+// This function contains the core logic to be shared
+function handleInteraction() {
+  if (waitingForAnswer) {
+    checkbox.disabled = true;
+
+    // Move question to small-label and show answer in big-label
+    document.getElementById("small-label").innerText = currentQuestion;
+    document.getElementById("big-label").innerText = currentAnswer;
+
+    let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
+    speech_2.rate = 1;
+
+    if (read_question) {
+      speechSynthesis.speak(speech_2);
+    }
+
+    if (big_label.classList.contains("hide") && checkbox.checked) {
+      big_label.classList.remove("hide");
+    }
+
+    waitingForAnswer = false;
+  } else {
+    checkbox.disabled = false;
+    // Generate a new question
+    if (!big_label.classList.contains("hide") && checkbox.checked) {
+      big_label.classList.add("hide");
+    }
+    generateQuestion();
+  }
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.code === "Space") {
     event.preventDefault(); // prevent page scroll
-    if (waitingForAnswer) {
-      checkbox.disabled = true;
-
-      // Move question to small-label and show answer in big-label
-      document.getElementById("small-label").innerText = currentQuestion;
-      document.getElementById("big-label").innerText = currentAnswer;
-
-      let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
-
-      speech_2.rate = 1;
-
-      if (read_question) {
-        speechSynthesis.speak(speech_2);
-      }
-
-      if (big_label.classList.contains("hide") && checkbox.checked) {
-        big_label.classList.remove("hide");
-      }
-
-      waitingForAnswer = false;
-    } else {
-      checkbox.disabled = false;
-      // Generate a new question
-      if (!big_label.classList.contains("hide") && checkbox.checked) {
-        big_label.classList.add("hide");
-      }
-      generateQuestion();
-    }
+    handleInteraction();
   }
+});
+
+document.addEventListener("touchstart", function (event) {
+  // Prevent default touch behavior like zoom on double-tap if needed
+  event.preventDefault();
+  handleInteraction();
 });
 
 checkbox.addEventListener("change", function () {
