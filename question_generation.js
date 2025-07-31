@@ -10,6 +10,24 @@ let display_status = "none";
 
 let read_question = false;
 
+let voicesLoaded = false;
+
+// Ensure voices are loaded before using speechSynthesis
+function loadVoices() {
+  return new Promise((resolve) => {
+    let voices = speechSynthesis.getVoices();
+    if (voices.length !== 0) {
+      voicesLoaded = true;
+      resolve();
+    } else {
+      speechSynthesis.onvoiceschanged = () => {
+        voicesLoaded = true;
+        resolve();
+      };
+    }
+  });
+}
+
 // For generate medium difficulty multiplication problem
 function generate_multiplication_operand() {
   const roundFriendly = [10, 20, 30, 40, 50];
@@ -90,7 +108,9 @@ function generateQuestion() {
   speech.rate = 1;
 
   if (read_question) {
-    speechSynthesis.speak(speech);
+    loadVoices().then(() => {
+      speechSynthesis.speak(speech);
+    });
   }
 
   waitingForAnswer = true;
@@ -109,7 +129,9 @@ function handleInteraction() {
     speech_2.rate = 1;
 
     if (read_question) {
-      speechSynthesis.speak(speech_2);
+      loadVoices().then(() => {
+        speechSynthesis.speak(speech_2);
+      });
     }
 
     if (big_label.classList.contains("hide") && checkbox.checked) {
