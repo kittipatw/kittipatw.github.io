@@ -89,7 +89,17 @@
     <div class="row touch-area d-flex align-items-start justify-content-center" style="height: 35%;">
       <div id="big-label" class="" style="font-size: 10em; line-height: 1;"></div>
     </div>
-    <div class="row touch-area" style="height: 25%;"></div>
+    <div class="row touch-area" style="height: 25%;">
+      <button id="say-btn">Say Something</button>
+      <script>
+        document.getElementById("say-btn").addEventListener("click", function () {
+          const utter = new SpeechSynthesisUtterance("Hello, this is working.");
+          utter.rate = 1;
+          utter.lang = "en-US";
+          speechSynthesis.speak(utter);
+        });
+      </script>
+    </div>
 
   </div>
 
