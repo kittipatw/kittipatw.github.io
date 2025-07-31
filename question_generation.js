@@ -1,3 +1,4 @@
+// --- (Your existing code from the top) ---
 const big_label = document.getElementById("big-label");
 const checkbox = document.getElementById("hide-question");
 const read_question_checkbox = document.getElementById("read-question");
@@ -5,12 +6,13 @@ const read_question_checkbox = document.getElementById("read-question");
 let currentQuestion = "";
 let currentAnswer = "";
 let waitingForAnswer = false;
-
 let display_status = "none";
-
 let read_question = false;
 
-// For generate medium difficulty multiplication problem
+// Add this new flag
+let speechEnginePrimed = false;
+
+// --- (Your generate_multiplication_operand and generateQuestion functions remain the same) ---
 function generate_multiplication_operand() {
   const roundFriendly = [10, 20, 30, 40, 50];
 
@@ -58,7 +60,6 @@ function generateQuestion() {
   const operators = ["+", "-", "x"];
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
-  // If the random operator is multiplication, we call the function to give us medium difficulty problem
   if (operator === "x") {
     [num1, num2] = generate_multiplication_operand();
   }
@@ -86,27 +87,42 @@ function generateQuestion() {
   document.getElementById("small-label").innerText = "";
 
   let speech = new SpeechSynthesisUtterance(question_speech);
-
   speech.rate = 1;
 
-  speechSynthesis.speak(speech);
+  if (read_question) {
+    speechSynthesis.speak(speech);
+  }
 
   waitingForAnswer = true;
 }
 
-// This function contains the core logic to be shared
+
+// This function is MODIFIED with the fix
 function handleInteraction() {
+  // --- FIX START ---
+  // On the very first user interaction, prime the engine.
+  if (!speechEnginePrimed && read_question_checkbox.checked) {
+    const primer = new SpeechSynthesisUtterance("");
+    primer.volume = 0; // Make it silent
+    speechSynthesis.speak(primer);
+    speechEnginePrimed = true;
+  }
+  // --- FIX END ---
+
   if (waitingForAnswer) {
     checkbox.disabled = true;
 
-    // Move question to small-label and show answer in big-label
     document.getElementById("small-label").innerText = currentQuestion;
     document.getElementById("big-label").innerText = currentAnswer;
 
     let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
     speech_2.rate = 1;
 
-    speechSynthesis.speak(speech_2);
+    if (read_question) {
+      // Cancel any previous speech to prevent overlap
+      speechSynthesis.cancel(); 
+      speechSynthesis.speak(speech_2);
+    }
 
     if (big_label.classList.contains("hide") && checkbox.checked) {
       big_label.classList.remove("hide");
@@ -115,7 +131,7 @@ function handleInteraction() {
     waitingForAnswer = false;
   } else {
     checkbox.disabled = false;
-    // Generate a new question
+    
     if (!big_label.classList.contains("hide") && checkbox.checked) {
       big_label.classList.add("hide");
     }
@@ -123,9 +139,10 @@ function handleInteraction() {
   }
 }
 
+// --- (Your event listeners remain the same) ---
 document.addEventListener("keydown", function (event) {
   if (event.code === "Space") {
-    event.preventDefault(); // prevent page scroll
+    event.preventDefault(); 
     handleInteraction();
   }
 });
@@ -134,7 +151,7 @@ document.querySelectorAll(".touch-area").forEach(function (el) {
   el.addEventListener(
     "touchstart",
     function (event) {
-      event.preventDefault(); // Prevents scrolling or zooming if needed
+      event.preventDefault(); 
       handleInteraction();
     },
     { passive: false }
