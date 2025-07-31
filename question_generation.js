@@ -53,8 +53,8 @@ function generate_multiplication_operand() {
 }
 
 function generateQuestion() {
-  let num1 = Math.floor(Math.random() * 100) + 1; // 1 to 100
-  let num2 = Math.floor(Math.random() * 100) + 1;
+  let num1 = Math.floor(Math.random() * 90) + 10; // 10 to 99
+  let num2 = Math.floor(Math.random() * 90) + 10; // 10 to 99
   const operators = ["+", "-", "x"];
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
