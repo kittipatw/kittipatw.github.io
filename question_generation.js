@@ -20,6 +20,8 @@ let currentVoice = engVoice;
 let currentLang = "en-US";
 let currentSpeechRate = 1;
 
+let currentDisplay = "none";
+
 const debug_area = document.getElementById("debug-area");
 
 document.getElementById("btn-en").addEventListener("change", () => {
@@ -134,12 +136,13 @@ function generateQuestion() {
   }
 
   waitingForAnswer = true;
+  currentDisplay = "question";
 }
 
 // This function contains the core logic to be shared
 function handleInteraction() {
   if (waitingForAnswer) {
-    hide_question_toggle.disabled = true;
+    // hide_question_toggle.disabled = true;
 
     // Move question to small-label and show answer in big-label
     document.getElementById("small-label").innerText = currentQuestion;
@@ -158,15 +161,14 @@ function handleInteraction() {
       speechSynthesis.speak(speech_2);
     }
 
-    if (big_label.classList.contains("hide") && hide_question_toggle.checked) {
-      big_label.classList.remove("hide");
-    }
+    big_label.classList.remove("hide");
 
     waitingForAnswer = false;
+    currentDisplay = "answer";
   } else {
-    hide_question_toggle.disabled = false;
+    // hide_question_toggle.disabled = false;
     // Generate a new question
-    if (!big_label.classList.contains("hide") && hide_question_toggle.checked) {
+    if (hide_question_toggle.checked) {
       big_label.classList.add("hide");
     }
     generateQuestion();
@@ -192,11 +194,21 @@ document.querySelectorAll(".touch-area").forEach(function (el) {
 });
 
 hide_question_toggle.addEventListener("change", function () {
-  document.getElementById("big-label").classList.toggle("hide");
+  if (currentDisplay === "question" && this.checked) {
+    big_label.classList.add("hide");
+  } else if (currentDisplay === "question" && !this.checked) {
+    big_label.classList.remove("hide");
+  }
+  // document.getElementById("big-label").classList.toggle("hide");
 });
 
 voice_toggle.addEventListener("change", function () {
   read_question = this.checked;
+  if (this.checked) {
+    voiceControl.classList.remove("d-none");
+  } else {
+    voiceControl.classList.add("d-none");
+  }
 });
 
 read_answer_toggle.addEventListener("change", function () {
