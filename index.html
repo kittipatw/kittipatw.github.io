@@ -11,8 +11,6 @@
     integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.1/font/bootstrap-icons.css" />
 
-  <!-- <link rel="stylesheet" href="{% static 'tg_airports_style.css' %}"> -->
-
   <style>
     .hide {
       display: none;
@@ -48,7 +46,7 @@
   </nav>
 
   <!-- Toast Container -->
-  <div id="status-toast" class="toast-container position-fixed top-25 end-0 p-3"></div>
+  <div id="status-toast" class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-5"></div>
 
   <div class="container text-center mt-4" style="height: 85%;">
     <div class="row" style="height: 15%;">
@@ -73,16 +71,16 @@
           </div>
           <div id="readAnswerControl"
             class="col d-none d-flex align-items-center justify-content-center form-check form-switch">
-            <input class="form-check-input me-2" type="checkbox" id="read-answer" checked>
-            <label class="form-check-label" for="read-answer">Read answer</label>
+            <input class="form-check-input me-2" type="checkbox" id="voice" checked>
+            <label class="form-check-label" for="voice">Voice</label>
           </div>
         </div>
 
         <div id="voice-control" class="row" style="height: 40%;">
           <div class="col-6 d-flex align-items-center justify-content-center form-check form-switch"
             style="height: 100%;">
-            <input class="form-check-input me-2" type="checkbox" id="voice">
-            <label class="form-check-label" for="voice">Voice</label>
+            <input class="form-check-input me-2" type="checkbox" id="read-answer" checked>
+            <label class="form-check-label" for="read-answer">Read answer</label>
           </div>
           <div class="col-6 d-flex align-items-center justify-content-center" style="height: 100%;">
             <label class="me-2">Language</label>
@@ -158,6 +156,7 @@
         `If you hear "Voice Activated!", voice is working properly. Otherwise, voice may not work.`,
         "warning"
       );
+      read_question = true;
     };
 
     voiceTest.addEventListener('click', testSpeak);
