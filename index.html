@@ -76,7 +76,7 @@
           </div>
         </div>
 
-        <div id="voice-control" class="row" style="height: 40%;">
+        <div id="voice-control" class="row d-none" style="height: 40%;">
           <div class="col-6 d-flex align-items-center justify-content-center form-check form-switch"
             style="height: 100%;">
             <input class="form-check-input me-2" type="checkbox" id="read-answer" checked>
@@ -176,7 +176,7 @@
 
       const isAppleDevice = /(Mac|iPhone|iPad|iPod)/i.test(navigator.userAgent);
 
-      if (isAppleDevice) {
+      if (isAppleDevice || true) {
         if (voiceControl) {
           voiceControl.classList.add('d-none');
         }
