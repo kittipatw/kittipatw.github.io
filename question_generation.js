@@ -1,10 +1,16 @@
 const big_label = document.getElementById("big-label");
+
 const hide_question_toggle = document.getElementById("hide-question");
 const voice_toggle = document.getElementById("voice");
 const read_answer_toggle = document.getElementById("read-answer");
 
+const include_time_question = document.getElementById("time_question");
+const include_geography_question =
+  document.getElementById("geography_question");
+
 let currentQuestion = "";
 let currentAnswer = "";
+let currentQuestionType = "";
 let waitingForAnswer = false;
 
 let display_status = "none";
@@ -42,114 +48,34 @@ document.getElementById("btn-th").addEventListener("change", () => {
   }
 });
 
-// For generate medium difficulty multiplication problem
-function generate_multiplication_operand() {
-  const roundFriendly = [10, 20, 30, 40, 50];
-
-  while (true) {
-    const a = Math.floor(Math.random() * 90) + 10; // 10 to 99
-    const b = Math.floor(Math.random() * 30) + 10; // 10 to 39
-
-    const closeToRoundA = roundFriendly.some(
-      (num) => a - num <= 2 && a - num >= 0
-    );
-    const closeToRoundB = roundFriendly.some(
-      (num) => b - num <= 2 && b - num >= 0
-    );
-    const divisibleA = a % 10 === 0;
-    const divisibleB = b % 10 === 0;
-
-    if (divisibleA && divisibleB) {
-      continue;
-    }
-
-    if (closeToRoundA && b % 10 > 4) {
-      continue;
-    }
-    if (closeToRoundB && a % 10 > 4) {
-      continue;
-    }
-
-    if (
-      (closeToRoundA || closeToRoundB || divisibleA || divisibleB) &&
-      a !== 10 &&
-      b !== 10
-    ) {
-      if (Math.random() < 0.5) {
-        return [a, b];
-      } else {
-        return [b, a];
-      }
-    }
-  }
-}
-
-function generateQuestion() {
-  let num1 = Math.floor(Math.random() * (99 - 11 + 1)) + 11; // 11 to 99
-  let num2 = Math.floor(Math.random() * (99 - 11 + 1)) + 11; // 11 to 99
-  const operators = ["+", "-", "x"];
-  const operator = operators[Math.floor(Math.random() * operators.length)];
-
-  // If the random operator is multiplication, we call the function to give us medium difficulty problem
-  if (operator === "x") {
-    [num1, num2] = generate_multiplication_operand();
-  }
-
-  let question = `${num1} ${operator} ${num2}`;
-  let question_speech = `${num1} ${operator} ${num2}`;
-  let answer;
-  switch (operator) {
-    case "+":
-      answer = num1 + num2;
-      break;
-    case "-":
-      answer = num1 - num2;
-      if (currentLang === "en-US") {
-        question_speech = `${num1} minus ${num2}`;
-      } else if (currentLang === "th-TH") {
-        question_speech = `${num1} ลบ ${num2}`;
-      }
-      break;
-    case "x":
-      answer = num1 * num2;
-      if (currentLang === "en-US") {
-        question_speech = `${num1} times ${num2}`;
-      } else if (currentLang === "th-TH") {
-        question_speech = `${num1} คูณ ${num2}`;
-      }
-      break;
-  }
-
-  currentQuestion = question;
-  currentAnswer = answer;
-  document.getElementById("big-label").innerText = question;
-  document.getElementById("small-label").innerText = "";
-
-  let speech = new SpeechSynthesisUtterance(question_speech);
-
-  speech.rate = currentSpeechRate;
-  speech.voice = currentVoice;
-  speech.lang = currentLang;
-
-  if (read_question) {
-    speechSynthesis.speak(speech);
-  }
-
-  waitingForAnswer = true;
-  currentDisplay = "question";
-}
-
 // This function contains the core logic to be shared
 function handleInteraction() {
+  // const use_time_question = Math.random() < 0.3;
+  const use_addon_question = Math.random() < 0.3;
+  const addon_mode = Math.floor(Math.random() * 2) + 1; // Random [1,2] 1=TIME 2=GEO
+
   if (waitingForAnswer) {
-    // hide_question_toggle.disabled = true;
-
+    // Show Answer
     // Move question to small-label and show answer in big-label
-    document.getElementById("small-label").innerText = currentQuestion;
-    document.getElementById("big-label").innerText = currentAnswer;
+    small_label.innerText = currentQuestion;
 
-    if (currentAnswer < 0 && currentLang === "th-TH") {
-      currentAnswer = `ลบ${Math.abs(currentAnswer)}`;
+    if (currentQuestionType === "math") {
+      big_label.style.fontSize = "10em";
+    } else if (currentQuestionType === "time") {
+      big_label.style.fontSize = "7em";
+    } else if (currentQuestionType === "geography") {
+      big_label.style.fontSize = "7em";
+    }
+
+    big_label.innerText = currentAnswer;
+
+    if (currentQuestionType === "math") {
+      if (currentAnswer < 0 && currentLang === "th-TH") {
+        currentAnswer = `ลบ${Math.abs(currentAnswer)}`;
+      }
+    }
+    if (currentQuestionType === "geography") {
+      currentAnswer = currentAnswer.split("").join(",");
     }
 
     let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
@@ -171,7 +97,38 @@ function handleInteraction() {
     if (hide_question_toggle.checked) {
       big_label.classList.add("hide");
     }
-    generateQuestion();
+
+    if (include_time_question.checked && include_geography_question.checked) {
+      if (use_addon_question) {
+        if (addon_mode === 1) {
+          generateTimeQuestion();
+        } else if (addon_mode === 2) {
+          const all_use = generateGeographyQuestion();
+          if (all_use) {
+            generateQuestion();
+          }
+        }
+      } else {
+        generateQuestion();
+      }
+    } else if (include_time_question.checked) {
+      if (use_addon_question) {
+        generateTimeQuestion();
+      } else {
+        generateQuestion();
+      }
+    } else if (include_geography_question.checked) {
+      if (use_addon_question) {
+        const all_use = generateGeographyQuestion();
+        if (all_use) {
+          generateQuestion();
+        }
+      } else {
+        generateQuestion();
+      }
+    } else {
+      generateQuestion();
+    }
   }
 }
 

@@ -15,10 +15,19 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  
+
   <style>
     .hide {
       display: none;
+    }
+
+    #toggle-question-setting {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #toggle-question-setting.fade-in {
+      opacity: 1;
     }
   </style>
 </head>
@@ -28,8 +37,8 @@
     <div class="container-fluid d-flex justify-content-between align-items-center">
       <!-- Left column: Branding -->
       <div class="col text-start d-flex align-items-center">
-        <a class="navbar-brand ms-3" href="/">Dernjoot</a>
-<!--         <span class="badge text-bg-warning">Beta</span> -->
+        <a class="navbar-brand ms-3 fw-lighter" href="/"><b>Dernjoot</b> v2</a>
+        <!-- <span class="badge text-bg-warning">Beta</span> -->
       </div>
 
       <!-- Center column: Menu bar -->
@@ -114,8 +123,51 @@
     <div class="row touch-area d-flex align-items-start justify-content-center" style="height: 35%;">
       <div id="big-label" class="" style="font-size: 10em; line-height: 1;"></div>
     </div>
-    <div class="row touch-area" style="height: 25%;">
-      <div id="debug-area"></div>
+    <div class="row" style="height: 25%;">
+      <!-- <div id="debug-area">
+      </div> -->
+      <div class="d-flex align-items-end justify-content-start p-0">
+        <button id="toggle-question-setting" class="btn btn-outline-secondary fade-in" type="button"
+          data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="true"
+          aria-controls="collapseSettings">
+          Question Settings
+        </button>
+        <div id="collapseSettings" class="collapse collapse-horizontal">
+          <div class="card" style="height: 100%; width: 350px;">
+            <div class="card-header d-flex justify-content-between align-items-center"
+              style="text-align: left !important;">
+              <span>Question Settings</span>
+              <button id="toggle-question-setting-close-btn" class="btn-close" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings"></button>
+            </div>
+
+            <div class="card-body" style="text-align: left !important;">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="time_question">
+                <label class="form-check-label" for="time_question">
+                  Include TIME questions <span class="badge text-bg-warning" style="--bs-bg-opacity: 1;">New!</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="geography_question">
+                <label class="form-check-label" for="geography_question">
+                  Include GEOGRAPHY questions <span class="badge text-bg-warning"
+                    style="--bs-bg-opacity: 1;">New!</span>
+                </label>
+              </div>
+              <!-- <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="general_question">
+                <label class="form-check-label" for="general_question">
+                  Include General questions
+                </label>
+              </div> -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- <div class="col-1"></div>
+      <div class="col"></div> -->
 
     </div>
 
@@ -145,6 +197,20 @@
         toast.remove();
       });
     }
+
+    document.getElementById('toggle-question-setting').addEventListener('click', () => {
+      document.getElementById('toggle-question-setting').classList.add('hide');
+      document.getElementById('toggle-question-setting').classList.remove('fade-in');
+    });
+
+    document.getElementById('toggle-question-setting-close-btn').addEventListener('click', () => {
+      setTimeout(() => {
+        document.getElementById('toggle-question-setting').classList.remove('hide');
+      }, 400);
+      setTimeout(() => {
+        document.getElementById('toggle-question-setting').classList.add('fade-in');
+      }, 450);
+    });
 
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
@@ -198,6 +264,9 @@
     crossorigin="anonymous"></script>
   <script src="metronome.js"></script>
   <script src="question_generation.js"></script>
+  <script src="math_question.js"></script>
+  <script src="time_question.js"></script>
+  <script src="geography_question.js"></script>
 </body>
 
 </html>
