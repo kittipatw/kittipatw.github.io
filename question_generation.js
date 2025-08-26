@@ -50,7 +50,7 @@ document.getElementById("btn-th").addEventListener("change", () => {
 // This function contains the core logic to be shared
 function handleInteraction() {
   // const use_time_question = Math.random() < 0.3;
-  const use_addon_question = Math.random() < 1;
+  const use_addon_question = Math.random() < 0.3;
   const addon_mode = Math.floor(Math.random() * 2) + 1; // Random [1,2] 1=TIME 2=GEO
 
   if (waitingForAnswer) {
