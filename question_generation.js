@@ -10,6 +10,7 @@ const include_geography_question =
 
 let currentQuestion = "";
 let currentAnswer = "";
+let currentThaiAnswer = "";
 let currentQuestionType = "";
 let waitingForAnswer = false;
 
@@ -35,7 +36,6 @@ document.getElementById("btn-en").addEventListener("change", () => {
     currentVoice = engVoice;
     currentLang = "en-US";
     currentSpeechRate = 1;
-    updateDebugArea();
   }
 });
 
@@ -44,14 +44,13 @@ document.getElementById("btn-th").addEventListener("change", () => {
     currentVoice = thaiVoice;
     currentLang = "th-TH";
     currentSpeechRate = 1;
-    updateDebugArea();
   }
 });
 
 // This function contains the core logic to be shared
 function handleInteraction() {
   // const use_time_question = Math.random() < 0.3;
-  const use_addon_question = Math.random() < 0.3;
+  const use_addon_question = Math.random() < 1;
   const addon_mode = Math.floor(Math.random() * 2) + 1; // Random [1,2] 1=TIME 2=GEO
 
   if (waitingForAnswer) {
@@ -74,14 +73,23 @@ function handleInteraction() {
         currentAnswer = `ลบ${Math.abs(currentAnswer)}`;
       }
     }
+    if (currentQuestionType === "time") {
+      currentAnswer = currentThaiAnswer;
+    }
     if (currentQuestionType === "geography") {
       currentAnswer = currentAnswer.split("").join(",");
     }
 
     let speech_2 = new SpeechSynthesisUtterance(currentAnswer);
     speech_2.rate = currentSpeechRate;
-    speech_2.voice = currentVoice;
-    speech_2.lang = currentLang;
+
+    if (currentQuestionType === "geography") {
+      speech_2.voice = engVoice;
+      speech_2.lang = "en-US";
+    } else {
+      speech_2.voice = currentVoice;
+      speech_2.lang = currentLang;
+    }
 
     if (read_question && read_answer) {
       speechSynthesis.speak(speech_2);

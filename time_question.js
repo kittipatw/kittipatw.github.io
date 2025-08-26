@@ -21,6 +21,20 @@ function generateTimeQuestion() {
     }
   }
 
+  function formatTimeThai(date, tzOffset = 0) {
+    const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+    const local = new Date(utc + tzOffset * 3600000);
+    let hh = local.getHours();
+    const mm = pad(local.getMinutes());
+    if (use12h) {
+      const suffix = hh >= 12 ? "พีเอ็ม" : "เอเอ็ม";
+      hh = hh % 12 || 12;
+      return `${hh}:${mm} ${suffix}`;
+    } else {
+      return `${pad(hh)}:${mm}`;
+    }
+  }
+
   function snapTo5(n) {
     return (Math.round(n / 5) * 5) % 60;
   }
@@ -29,6 +43,12 @@ function generateTimeQuestion() {
     if (h > 0 && m > 0) return `${h} hours ${m} minutes`;
     if (h > 0) return `${h} hours`;
     return `${m} minutes`;
+  }
+
+  function durationTextThai(h, m) {
+    if (h > 0 && m > 0) return `${h} ชั่วโมง ${m} นาที`;
+    if (h > 0) return `${h} ชั่วโมง`;
+    return `${m} นาที`;
   }
 
   function randomDuration() {
@@ -63,6 +83,7 @@ function generateTimeQuestion() {
   }
 
   let question = "";
+  let thai_question = "";
   let answer = "";
 
   // --- ADD / SUBTRACT ---
@@ -72,12 +93,21 @@ function generateTimeQuestion() {
       date.setHours(date.getHours() + h);
       date.setMinutes(date.getMinutes() + m);
       question = `${formatTime(baseDate)} plus ${durationText(h, m)}.`;
+      thai_question = `${formatTimeThai(baseDate)} บวก ${durationTextThai(
+        h,
+        m
+      )}`;
     } else {
       date.setHours(date.getHours() - h);
       date.setMinutes(date.getMinutes() - m);
       question = `${formatTime(baseDate)} minus ${durationText(h, m)}.`;
+      thai_question = `${formatTimeThai(baseDate)} ลบ ${durationTextThai(
+        h,
+        m
+      )}`;
     }
     answer = formatTime(date);
+    currentThaiAnswer = formatTimeThai(date);
   }
 
   // --- TIMEZONE ---
@@ -111,7 +141,15 @@ function generateTimeQuestion() {
     } plus ${durationText(plusH, plusM)}, what time in GMT${
       toTz >= 0 ? "+" + toTz : toTz
     }?`;
+
+    thai_question = `${formatTimeThai(questionTime, fromTz)} จีเอ็มที${
+      fromTz >= 0 ? "บวก" + fromTz : "ลบ" + Math.abs(fromTz)
+    } บวก ${durationTextThai(plusH, plusM)}, คือกี่โมงในเวลา จีเอ็มที${
+      toTz >= 0 ? "บวก" + toTz : "ลบ" + Math.abs(toTz)
+    }?`;
+
     answer = formatTime(arrivalUTC, toTz);
+    currentThaiAnswer = formatTimeThai(arrivalUTC, toTz);
   }
 
   // --- DURATION ---
@@ -146,7 +184,15 @@ function generateTimeQuestion() {
     }, arrive ${formatTime(arrive, tz2)} GMT${
       tz2 >= 0 ? "+" + tz2 : tz2
     }, how long?`;
+
+    thai_question = `เครื่องออกเวลา ${formatTimeThai(depart, tz1)} จีเอ็มที${
+      tz1 >= 0 ? "บวก" + tz1 : "ลบ" + Math.abs(tz1)
+    }, ถึงเวลา ${formatTimeThai(arrive, tz2)} จีเอ็มที${
+      tz2 >= 0 ? "บวก" + tz2 : "ลบ" + Math.abs(tz2)
+    }, ใช้เวลาบินเท่าไหร่`;
+
     answer = durationText(travelH, travelM);
+    currentThaiAnswer = durationTextThai(travelH, travelM);
   }
 
   // Logic for displaying question and answer then call speech
@@ -158,6 +204,9 @@ function generateTimeQuestion() {
 
   // Add here for custom speech (different from display)
   let question_speech = question;
+  if (currentLang === "th-TH") {
+    question_speech = thai_question;
+  }
 
   let speech = new SpeechSynthesisUtterance(question_speech);
 
