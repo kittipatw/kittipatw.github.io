@@ -142,8 +142,8 @@ function scheduleRandomTick() {
   if (beatCounter >= pauseAfterBeats) {
     inPause = true;
 
-    // Show "PAUSE" during the break
-    bpmDisplay.textContent = "PAUSE";
+    // Show "Pause" during the break
+    bpmDisplay.textContent = "Pause";
 
     const pauseDuration = getRandomInt(1000, 5000); // 1–5 seconds
     setTimeout(() => {
